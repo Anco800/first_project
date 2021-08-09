@@ -23,9 +23,9 @@ function userAuth({ email, name, age, password, height }) {
       const user = credentials.user;
 
       db.collection("users").doc(user.email).set({
-        userEmailAddress: email,
-        userAge: age,
-        userName: name,
+        email,
+        age,
+        name,
         height,
       });
 
