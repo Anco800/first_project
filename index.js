@@ -1,3 +1,12 @@
 const { userAuth } = require("./firebase");
 
-userAuth("elai@gmail.com", "Nitai", 15, "123456");
+const newUser = {
+  email: "elai@gmail.com",
+  name: "Nitai",
+  age: 15,
+  password: "123456",
+};
+
+newUser.height = 1.99;
+
+userAuth(newUser);

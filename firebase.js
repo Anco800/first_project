@@ -15,7 +15,7 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 
-function userAuth(email, name, age, password) {
+function userAuth({ email, name, age, password, height }) {
   return firebase
     .auth()
     .createUserWithEmailAndPassword(email, password)
@@ -25,7 +25,8 @@ function userAuth(email, name, age, password) {
       db.collection("users").doc(user.email).set({
         userEmailAddress: email,
         userAge: age,
-        userName: name
+        userName: name,
+        height,
       });
 
       return credentials.user;
