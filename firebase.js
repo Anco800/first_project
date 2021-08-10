@@ -14,21 +14,33 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
+const db1 = firebase.firestore();
 
-function userAuth({ email, firstName, lastName, age, password, height }) {
+function userAuth({ email,
+ firstName,
+ lastName,
+ age,
+ password,
+ height,
+ teamName
+ }) {
   return firebase
     .auth()
     .createUserWithEmailAndPassword(email, password)
     .then(function (credentials) {
       const user = credentials.user;
-      const user_id = credentials.user.uid
+      const user_id = credentials.user.uid;
+      db1.collection("teams").doc(user.email).set({
+        teamName,
+        createdByUserId: user_id,
+      });
       db.collection("users").doc(user.uid).set({
         email,
         age,
         firstName,
         lastName,
         height,
-        userId: user_id ,
+        userId: user_id,
       });
 
       return credentials.user;
