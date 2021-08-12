@@ -11,43 +11,70 @@ const firebaseConfig = {
   appId: "1:832898376291:web:0c710de5a2f9619e2b0e56",
 };
 
+//Design Pattern: Singlton
 firebase.initializeApp(firebaseConfig);
 
+// DRY = Dont repeat yourself
+
 const db = firebase.firestore();
-const db1 = firebase.firestore();
 
-function userAuth({ email,
- firstName,
- lastName,
- age,
- password,
- height,
- teamName
- }) {
-  return firebase
-    .auth()
-    .createUserWithEmailAndPassword(email, password)
-    .then(function (credentials) {
-      const user = credentials.user;
-      const user_id = credentials.user.uid;
-      db1.collection("teams").doc(user.email).set({
-        teamName,
-        createdByUserId: user_id,
-      });
-      db.collection("users").doc(user.uid).set({
-        email,
-        age,
-        firstName,
-        lastName,
-        height,
-        userId: user_id,
-      });
+/*
 
-      return credentials.user;
-    })
-    .catch(function (error) {
-      return error;
-    });
+userAuth(user){
+
+  const email = user.email
+  const password = user.password
+
+  // OR
+
+  const {email, password} = user
 }
 
-module.exports = { userAuth };
+*/
+
+const auth = firebase.auth();
+
+function registerUser(email, password, metaData) {
+  try {
+    const userCred = auth.createUserWithEmailAndPassword(email, password);
+    db.collection("users").doc("userInfo").set(metaData);
+    return userCred.user;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function signUserIn(email, password) {
+  try {
+    const { user } = await auth.signInWithEmailAndPassword(email, password);
+
+    const currentUser = {
+      email: user.email,
+      uid: user.uid,
+    };
+
+    // db.collection("users").add(currentUser);
+    await getDoc(currentUser.uid);
+
+    return currentUser;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getDoc(uid) {
+  try {
+    const doc = await db.collection("teams").doc(uid).get();
+    if (doc.exists) {
+      console.log("Document data:", doc.data());
+    } else {
+      console.log("No such document!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+
+module.exports = { registerUser, signUserIn, firebase };
